@@ -1,5 +1,3 @@
-const MAX_REQUEST = 10
-
 let reqNo : number = 0
 
 type Body = {
@@ -7,6 +5,8 @@ type Body = {
 }
 
 class Controller {
+
+  constructor(private maxReuests : number) {}
 
   async getTicket(body : Body) : Promise<number> {
     console.log('In getTicket %s', JSON.stringify(body))
@@ -16,7 +16,7 @@ class Controller {
       const noOfTickets = body.noOfTickets
       // console.log(noOfTickets)
       reqNo++
-      if(reqNo <= MAX_REQUEST) {
+      if(reqNo <= this.maxReuests) {
         // console.log(reqNo)
         setTimeout(() => {
           reqNo--

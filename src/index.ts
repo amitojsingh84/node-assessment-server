@@ -1,17 +1,18 @@
-const http          = require('http'),
-      Ticket        = require('./controller'),
+const  Ticket       = require('./controller'),
      { getReqData } = require('./utils')
 
-const PORT        = process.env.PORT || 5000,
+import * as http from 'http'
+
+const PORT        = 3000,
       STATUS_CODE = {
                       OK        : 200,
                       NOT_FOUND : 404
                     },
       HTTP_METHOD = {
-                      GET    : 'GET',
-                      POST   : 'POST'
+                      POST : 'POST'
                     }
 
+// TODO : should not be async
 const server = http.createServer(async (req : any, res : any) => {
 
   if (req.url === '/process/ticket' && req.method === HTTP_METHOD.POST) {
@@ -30,3 +31,30 @@ const server = http.createServer(async (req : any, res : any) => {
 server.listen(PORT, () => {
   console.log(`server started on port: ${PORT}`)
 })
+
+
+export class AssessmentServer {
+  private server : http.Server
+
+  constructor(private port : number, private controller : ApiController) {
+    this.server = http.createServer(this.handleRequest.bind(this))
+  }
+
+  public start() {
+
+  }
+
+  private async handleRequest(req : http.IncomingMessage, res : http.ServerResponse) {
+
+  }
+}
+
+/**
+ * To make the request you have to do a POST hit on http://localhost:3000/process/ticket
+ */
+
+const args = process.argv,
+      controller = new ApiController(args[2]),
+      assServer = new AssessmentServer(PORT, controller)
+    
+assServer.start()
