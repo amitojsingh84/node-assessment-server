@@ -1,5 +1,4 @@
-let reqNo : number = 0
-// const maxReq = 10
+const MS_MULTIPLIER = 1000
 
 type Body = {
   noOfTickets : number 
@@ -7,26 +6,22 @@ type Body = {
 
 export class ApiController {
 
-  constructor(private maxRequests : number) {}
+  private noOfOngoingRequests : number = 0
 
-  async getTicket(body : Body) : Promise<number> {
-    console.log('In getTicket %s', JSON.stringify(body))
+  constructor(private maxRequests : number = 0) {}
 
-    return new Promise((resolve) => {
-      console.log(reqNo)
-      const noOfTickets = body.noOfTickets
-      console.log(noOfTickets)
-      console.log(this.maxRequests)
-      reqNo++
-      if(reqNo <= this.maxRequests) {
-        // console.log(reqNo)
-        setTimeout(() => {
-          reqNo--
-          resolve(1)
-        }, noOfTickets * 1000)
-      } else {
-        resolve(0)
-      }
+  public async processTickets(body : Body) {
+    if(!body.noOfTickets) throw new Error('noOfTickets not defined.')
+
+    if(this.noOfOngoingRequests >= this.maxRequests) throw new Error('Server busy.')
+
+    this.noOfOngoingRequests ++
+    await this.sleep(body.noOfTickets * MS_MULTIPLIER)
+  }
+
+  private async sleep(ms : number) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, ms)
     })
   }
 }
