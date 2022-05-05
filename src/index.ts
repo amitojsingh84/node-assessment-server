@@ -26,7 +26,11 @@ export class AssessmentServer {
     this.server.on('listening', this.onListening.bind(this, this.port))
   }
 
-  // TODO : stop function
+  public stop() {
+    this.server.close()
+    console.debug('server stopped.')
+    process.exit()
+  }
 
   private async handleRequest(req : http.IncomingMessage, res : http.ServerResponse) {
     const { headers, method, url: reqUrl }  = req
@@ -108,6 +112,11 @@ const args             = process.argv,
       controller       = new ApiController(+args[2]),
       assessmentServer = new AssessmentServer(PORT, controller)
 
-// TODO : event handler for 'SIGINT', 'SIGTERM'
+process.on('SIGINT', () => {
+  assessmentServer.stop()
+})
+process.on('SIGTERM', () => {
+  assessmentServer.stop()
+})
 
 assessmentServer.start()

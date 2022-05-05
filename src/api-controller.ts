@@ -17,6 +17,7 @@ export class ApiController {
 
     this.noOfOngoingRequests ++
     await this.sleep(body.noOfTickets * MS_MULTIPLIER)
+    this.noOfOngoingRequests --
   }
 
   private async sleep(ms : number) {
