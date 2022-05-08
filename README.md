@@ -1,9 +1,9 @@
-# Node Assessment Server
+# Node.js Assessment Server
 
-## Setup the server (only one time)
-- clone from github using following cmd.
+## Server setup (one time only)
+- clone from GitHub using following cmd.
 ```
-git clone https://github.com/amitojsingh84/node-assessment-server.git
+git clone https://github.com/amitojsingh84/node-assessment-server
 ```
 - Install the npm packages.
 ```
@@ -12,8 +12,10 @@ npm install
 
 ## Start the server
 - Server will run at port 3000.
+- Server files will be auto compiled after server setup.
 ```
-npm run start <number-of-threads>
+npm run server <number-of-threads>        //to start the server
+npm start <number-of-threads>             //to recompile files & start the server
 ```
 
 ## Stop the server
@@ -29,7 +31,7 @@ const type request = {
 }
 
 const type response = {
-  success : 0 | 1
+  response : 'Success' | 'Failure'
 }
 ```
 - To hit the API make a `POST` request to `http://localhost:3000/process/ticket` with the param as json data.

@@ -1,22 +1,13 @@
 {
-  "name": "assessment-server",
-  "version": "1.0.0",
-  "description": "Node assessment server",
+  "name": "node.js-assessment-server",
+  "version": "1.1.0",
   "main": "build/index.js",
   "scripts": {
-    "start": "tsc && node build/index.js"
+    "postinstall": "tsc",
+    "start": "tsc && node build/index.js",
+    "server": "node build/index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/amitojsingh84/node-assessment-server.git"
-  },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/amitojsingh84/node-assessment-server/issues"
-  },
-  "homepage": "https://github.com/amitojsingh84/node-assessment-server#readme",
   "devDependencies": {
     "@types/node": "^16.11.32",
     "typescript": "^4.6.3"

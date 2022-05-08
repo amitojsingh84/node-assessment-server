@@ -28,15 +28,14 @@ export class AssessmentServer {
 
   public stop() {
     this.server.close()
-    console.debug('server stopped.')
+    console.debug('Server stopped')
     process.exit()
   }
 
   private async handleRequest(req : http.IncomingMessage, res : http.ServerResponse) {
-    const { headers, method, url: reqUrl }  = req
+    const { headers, method, url: reqUrl } = req
 
     try {
-
       if(!method || !reqUrl) return this.sendResponse(res, { message: 'Invalid path' }, STATUS_CODE.NOT_FOUND)
       
       const baseUrl = [HTTP_PROTOCOL, '//', headers.host].join(''),
@@ -80,21 +79,21 @@ export class AssessmentServer {
   }
 
   private onListening(port : number) {
-    console.info('Server listening on port %s.', port)
+    console.info('Server listening on port %s', port)
   }
 
   private onError(err : any) {
-    console.error('Error on server. %s', err)
+    console.error('Error on server %s', err)
     process.exit(1)
   }
 
   private async invokeApi(params : any, res : http.ServerResponse) {
     try {   
-      console.log('Processing API.', params)   
+      console.log('Processing API', params)
       await this.controller.processTickets(params)
-      return this.sendResponse(res, { success : 1 }, STATUS_CODE.OK)
+      return this.sendResponse(res, { response : 'Success' }, STATUS_CODE.OK)
     } catch(err) {
-      return this.sendResponse(res, { success : 0 }, STATUS_CODE.OK)
+      return this.sendResponse(res, { response : 'Failure' }, STATUS_CODE.OK)
     }
   }
 
@@ -102,7 +101,7 @@ export class AssessmentServer {
                        response    : {[index : string] : any}, 
                        statusCode  : number) {
 
-    console.log('Sending API response.', response)   
+    console.log('Sending API response', response)
     res.writeHead(statusCode, { [HTTP_HEADER_KEY.contentType] : HTTP_HEADER_VALUE_JSON })
     res.end(JSON.stringify(response))
   }
