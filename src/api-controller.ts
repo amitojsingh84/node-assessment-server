@@ -16,7 +16,8 @@ export class ApiController {
     if(this.noOfOngoingRequests >= this.maxRequests) throw new Error('Server busy')
 
     this.noOfOngoingRequests ++
-    await this.sleep(body.noOfTickets * MS_MULTIPLIER)
+    const requestTime = body.noOfTickets * MS_MULTIPLIER
+    await this.sleep(requestTime)
     this.noOfOngoingRequests --
   }
 

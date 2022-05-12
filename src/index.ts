@@ -2,6 +2,7 @@ import { ApiController }  from './api-controller'
 import * as http          from 'http'
 import * as url           from 'url'
 import * as stream        from 'stream'
+import lo                 from 'lodash'
 
 const PORT                   = 3000,
       HTTP_PROTOCOL          = 'http:',
@@ -11,7 +12,8 @@ const PORT                   = 3000,
                                   NOT_FOUND : 404
                                },
       HTTP_METHOD            = { POST : 'POST' },
-      HTTP_HEADER_KEY        = { contentType : 'content-type' }
+      HTTP_HEADER_KEY        = { contentType : 'content-type' },
+      DEFAULT_REQUEST_ID     = '---'
 
 export class AssessmentServer {
   private server : http.Server
@@ -36,14 +38,15 @@ export class AssessmentServer {
     const { headers, method, url: reqUrl } = req
 
     try {
-      if(!method || !reqUrl) return this.sendResponse(res, { message: 'Invalid path' }, STATUS_CODE.NOT_FOUND)
+      if(!method || !reqUrl) return this.sendResponse(res, DEFAULT_REQUEST_ID, {},
+                                                      { message: 'Invalid path' }, STATUS_CODE.NOT_FOUND)
       
       const baseUrl = [HTTP_PROTOCOL, '//', headers.host].join(''),
             urlObj  = new url.URL(reqUrl, baseUrl),
             path    = urlObj.pathname
 
       if(!path || path !== '/process/ticket' || method !== HTTP_METHOD.POST)
-        return this.sendResponse(res, { message: 'Invalid path' }, STATUS_CODE.NOT_FOUND)
+        return this.sendResponse(res, DEFAULT_REQUEST_ID, {}, { message: 'Invalid path' }, STATUS_CODE.NOT_FOUND)
 
       const params = await this.parseBody(req)
       await this.invokeApi(params, res)
@@ -88,22 +91,36 @@ export class AssessmentServer {
   }
 
   private async invokeApi(params : any, res : http.ServerResponse) {
-    try {   
-      console.log('Processing API', params)
+    const requestId = this.getRandomRequestId()
+
+    try {
+      console.log('API req', requestId, params)
       await this.controller.processTickets(params)
-      return this.sendResponse(res, { response : 'Success' }, STATUS_CODE.OK)
+      return this.sendResponse(res, requestId, params, { response : 'Success' }, STATUS_CODE.OK)
     } catch(err) {
-      return this.sendResponse(res, { response : 'Failure' }, STATUS_CODE.OK)
+      return this.sendResponse(res, requestId, params, { response : 'Failure' }, STATUS_CODE.OK)
     }
   }
 
-  private sendResponse(res         : http.ServerResponse, 
-                       response    : {[index : string] : any}, 
+  private sendResponse(httpRes     : http.ServerResponse,
+                       requestId   : string,
+                       req         : {[index : string] : any},
+                       resp        : {[index : string] : any},
                        statusCode  : number) {
 
-    console.log('Sending API response', response)
-    res.writeHead(statusCode, { [HTTP_HEADER_KEY.contentType] : HTTP_HEADER_VALUE_JSON })
-    res.end(JSON.stringify(response))
+    console.log('API res', requestId,req, resp)
+    httpRes.writeHead(statusCode, { [HTTP_HEADER_KEY.contentType] : HTTP_HEADER_VALUE_JSON })
+    httpRes.end(JSON.stringify(resp))
+  }
+
+  private getRandomRequestId() {
+    const requestId = `${this.getRandomCharacter()}${this.getRandomCharacter()}${this.getRandomCharacter()}`
+  
+    return requestId
+  }
+
+  private getRandomCharacter() {
+    return String.fromCharCode(65 + lo.random(0, 25, false))
   }
 }
 
